@@ -243,6 +243,7 @@ import AVFoundation
 		super.viewDidLoad()
 		previewLayer = PreviewView(frame: CGRect(x: 0.0, y: 0.0, width: view.bounds.width, height: view.bounds.height))
 		previewLayer.center = view.center
+		previewLayer.videoGravity = AVLayerVideoGravityResizeAspectFill
 		// Add Gesture Recognizers
 
 		addGestureRecognizersTo(view: previewLayer)
