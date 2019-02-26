@@ -241,7 +241,7 @@ import AVFoundation
 
 	override open func viewDidLoad() {
 		super.viewDidLoad()
-		previewLayer = PreviewView(frame: view.frame, videoGravity: videoGravity)
+		previewLayer = PreviewView(frame: view.frame, videoGravity: AVLayerVideoGravityResizeAspectFill)
     previewLayer.center = view.center
 		// Add Gesture Recognizers
 		addGestureRecognizersTo(view: previewLayer)
