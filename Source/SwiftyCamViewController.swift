@@ -115,7 +115,7 @@ import AVFoundation
 	/// Sets the maximum zoom scale allowed during gestures gesture
 
 	public var maxZoomScale				         = CGFloat.greatestFiniteMagnitude
-  
+
 	/// Sets whether Tap to Focus and Tap to Adjust Exposure is enabled for the capture session
 
 	public var tapToFocus                        = true
@@ -133,13 +133,13 @@ import AVFoundation
 	/// Sets whether a double tap to switch cameras is supported
 
 	public var doubleTapCameraSwitch            = true
-    
+
     /// Sets whether swipe vertically to zoom is supported
-    
+
     public var swipeToZoom                     = true
-    
+
     /// Sets whether swipe vertically gestures should be inverted
-    
+
     public var swipeToZoomInverted             = false
 
 	/// Set default launch camera
@@ -220,9 +220,9 @@ import AVFoundation
 	/// UIView for front facing flash
 
 	public var flashView                    : UIView?
-    
+
   /// Pan Translation
-    
+
   public var previousPanTranslation       : CGFloat = 0.0
 
 	/// Last changed orientation
@@ -242,7 +242,7 @@ import AVFoundation
 	override open func viewDidLoad() {
 		super.viewDidLoad()
 		previewLayer = PreviewView(frame: CGRect(x: 0.0, y: 0.0, width: view.bounds.width, height: view.bounds.height))
-
+		previewLayer.center = view.center
 		// Add Gesture Recognizers
 
 		addGestureRecognizersTo(view: previewLayer)
@@ -278,15 +278,15 @@ import AVFoundation
 	}
 
     // MARK: ViewDidLayoutSubviews
-    
+
     /// ViewDidLayoutSubviews() Implementation
-    
-    
+
+
     override open func viewDidLayoutSubviews() {
         previewLayer.frame = CGRect(x: 0.0, y: 0.0, width: view.bounds.width, height: view.bounds.height)
         super.viewDidLayoutSubviews()
     }
-    
+
 	// MARK: ViewDidAppear
 
 	/// ViewDidAppear(_ animated:) Implementation
@@ -311,12 +311,12 @@ import AVFoundation
 				// Begin Session
 				self.session.startRunning()
 				self.isSessionRunning = self.session.isRunning
-                
+
                 // Preview layer video orientation can be set only after the connection is created
                 DispatchQueue.main.async {
                     self.previewLayer.videoPreviewLayer.connection?.videoOrientation = self.getPreviewLayerOrientation()
                 }
-                
+
 			case .notAuthorized:
 				// Prompt to App Settings
 				self.promptToAppSettings()
@@ -501,11 +501,11 @@ import AVFoundation
 			print("[SwiftyCam]: Switching between cameras while recording video is not supported")
 			return
 		}
-        
+
         guard session.isRunning == true else {
             return
         }
-        
+
 		switch currentCamera {
 		case .front:
 			currentCamera = .rear
@@ -714,7 +714,7 @@ import AVFoundation
 			self.deviceOrientation = UIDevice.current.orientation
 		}
 	}
-    
+
     @objc public func getPreviewLayerOrientation() -> AVCaptureVideoOrientation {
         // Depends on layout orientation, not device orientation
         switch UIApplication.shared.statusBarOrientation {
@@ -1010,7 +1010,7 @@ extension SwiftyCamViewController {
 
 	@objc fileprivate func zoomGesture(pinch: UIPinchGestureRecognizer) {
 		guard pinchToZoom == true && self.currentCamera == .rear else {
-			//ignore pinch 
+			//ignore pinch
 			return
 		}
 		do {
@@ -1078,42 +1078,42 @@ extension SwiftyCamViewController {
 		}
 		switchCamera()
 	}
-    
+
     @objc private func panGesture(pan: UIPanGestureRecognizer) {
-        
+
         guard swipeToZoom == true && self.currentCamera == .rear else {
             //ignore pan
             return
         }
         let currentTranslation    = pan.translation(in: view).y
         let translationDifference = currentTranslation - previousPanTranslation
-        
+
         do {
             let captureDevice = AVCaptureDevice.devices().first as? AVCaptureDevice
             try captureDevice?.lockForConfiguration()
-            
+
             let currentZoom = captureDevice?.videoZoomFactor ?? 0.0
-            
+
             if swipeToZoomInverted == true {
                 zoomScale = min(maxZoomScale, max(1.0, min(currentZoom - (translationDifference / 75),  captureDevice!.activeFormat.videoMaxZoomFactor)))
             } else {
                 zoomScale = min(maxZoomScale, max(1.0, min(currentZoom + (translationDifference / 75),  captureDevice!.activeFormat.videoMaxZoomFactor)))
 
             }
-            
+
             captureDevice?.videoZoomFactor = zoomScale
-            
+
             // Call Delegate function with current zoom scale
             DispatchQueue.main.async {
                 self.cameraDelegate?.swiftyCam(self, didChangeZoomLevel: self.zoomScale)
             }
-            
+
             captureDevice?.unlockForConfiguration()
-            
+
         } catch {
             print("[SwiftyCam]: Error locking configuration")
         }
-        
+
         if pan.state == .ended || pan.state == .failed || pan.state == .cancelled {
             previousPanTranslation = 0.0
         } else {
@@ -1142,7 +1142,7 @@ extension SwiftyCamViewController {
 		doubleTapGesture.numberOfTapsRequired = 2
 		doubleTapGesture.delegate = self
 		view.addGestureRecognizer(doubleTapGesture)
-        
+
         let panGesture = UIPanGestureRecognizer(target: self, action: #selector(panGesture(pan:)))
         panGesture.delegate = self
         view.addGestureRecognizer(panGesture)
