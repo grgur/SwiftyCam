@@ -241,13 +241,14 @@ import AVFoundation
 
 	override open func viewDidLoad() {
 		super.viewDidLoad()
-		previewLayer = PreviewView(frame: CGRect(x: 0.0, y: 0.0, width: view.bounds.width, height: view.bounds.height))
-		previewLayer.center = view.center
+		previewLayer = PreviewView(frame: view.frame, videoGravity: videoGravity)
+    previewLayer.center = view.center
 		// Add Gesture Recognizers
-
 		addGestureRecognizersTo(view: previewLayer)
 
-		self.view.addSubview(previewLayer)
+    view.addSubview(previewLayer)
+    view.sendSubviewToBack(previewLayer)
+
 		previewLayer.session = session
 
 		// Test authorization status for Camera and Micophone
